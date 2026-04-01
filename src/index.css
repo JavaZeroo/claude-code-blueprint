@@ -1,0 +1,99 @@
+:root {
+  color-scheme: dark;
+  font-family: var(--font-body);
+  line-height: 1.6;
+  font-weight: 400;
+  color: #ebf1f7;
+  background:
+    radial-gradient(circle at top, rgba(49, 89, 148, 0.28), transparent 30%),
+    linear-gradient(180deg, #07111c 0%, #050910 100%);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --font-display: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', serif;
+  --font-body: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', monospace;
+  --bg: #07111c;
+  --panel: #0b1422;
+  --line: rgba(148, 163, 184, 0.14);
+  --text: #edf3f9;
+  --text-soft: #d4e4f3;
+  --muted: #8ea6bc;
+  --accent: #8cc5ff;
+  --accent-2: #f19f59;
+  --max-width: 1320px;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(140, 197, 255, 0.08), transparent 24%),
+    radial-gradient(circle at 85% 0%, rgba(241, 159, 89, 0.08), transparent 18%),
+    linear-gradient(180deg, #08111d 0%, #04070d 100%);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: radial-gradient(circle at center, black 42%, transparent 90%);
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.045) 0.8px, transparent 0.9px);
+  background-size: 12px 12px;
+  opacity: 0.18;
+  mix-blend-mode: soft-light;
+}
+
+img,
+picture,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+#root {
+  width: min(var(--max-width), calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 1rem 0 3rem;
+}
+
+@media (max-width: 720px) {
+  #root {
+    width: min(100vw - 20px, 1320px);
+    padding-top: 0.7rem;
+  }
+}
