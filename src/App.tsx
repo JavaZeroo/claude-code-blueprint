@@ -1,32 +1,25 @@
 import { useMemo, useState } from 'react'
 import './App.css'
-import { content, type Locale, type ModuleKey, type PageKey } from './data'
+import { content, type Locale, type ModuleKey } from './data'
 
 function App() {
   const [locale, setLocale] = useState<Locale>('zh')
-  const [page, setPage] = useState<PageKey>('home')
   const [activeModule, setActiveModule] = useState<ModuleKey>('agent')
   const t = useMemo(() => content[locale], [locale])
-  const module = t.map.modules.find((item) => item.key === activeModule) ?? t.map.modules[0]
+  const active = t.graph.nodes.find((node) => node.key === activeModule) ?? t.graph.nodes[0]
 
   return (
     <div className="app-shell">
       <header className="topbar panel-soft">
         <div>
           <p className="badge">{t.meta.badge}</p>
-          <p className="eyebrow">{t.home.overline}</p>
+          <p className="eyebrow">{t.hero.overline}</p>
         </div>
         <div className="topbar-actions">
-          <nav className="nav" aria-label="Primary navigation">
-            {t.nav.map((item) => (
-              <button
-                key={item.key}
-                className={`nav-tab ${page === item.key ? 'active' : ''}`}
-                onClick={() => setPage(item.key)}
-              >
-                {item.label}
-              </button>
-            ))}
+          <nav className="nav" aria-label="Section navigation">
+            <a href="#graph">{t.nav.overview}</a>
+            <a href="#flow">{t.nav.flow}</a>
+            <a href="#mindmap">{t.nav.mindmap}</a>
           </nav>
           <button
             className="lang-switch"
@@ -39,197 +32,92 @@ function App() {
       </header>
 
       <main>
-        {page === 'home' && (
-          <section className="page page-home">
-            <section className="hero panel panel-hero">
-              <div className="hero-copy">
-                <p className="section-overline">{t.home.overline}</p>
-                <h1>{t.home.title}</h1>
-                <p className="hero-subtitle">{t.home.subtitle}</p>
-                <p className="hero-summary">{t.home.summary}</p>
-                <div className="cta-row">
-                  <button className="button primary" onClick={() => setPage('map')}>
-                    {t.home.primaryCta}
-                  </button>
-                  <button className="button secondary" onClick={() => setPage('build')}>
-                    {t.home.secondaryCta}
-                  </button>
-                </div>
-              </div>
+        <section className="hero panel panel-hero">
+          <div className="hero-copy">
+            <p className="section-overline">{t.hero.overline}</p>
+            <h1>{t.hero.title}</h1>
+            <p className="hero-subtitle">{t.hero.subtitle}</p>
+            <p className="hero-summary">{t.hero.summary}</p>
+          </div>
 
-              <div className="hero-system-map" aria-label={t.common.interactiveLabel}>
-                <div className="system-core">Infra Core</div>
-                <button className="map-node node-agent" onClick={() => { setPage('map'); setActiveModule('agent') }}>
-                  Agent
-                </button>
-                <button className="map-node node-router" onClick={() => { setPage('map'); setActiveModule('router') }}>
-                  Router
-                </button>
-                <button className="map-node node-context" onClick={() => { setPage('map'); setActiveModule('context') }}>
-                  Context
-                </button>
-                <button className="map-node node-tools" onClick={() => { setPage('map'); setActiveModule('tools') }}>
-                  Tools
-                </button>
-                <button className="map-node node-runtime" onClick={() => { setPage('map'); setActiveModule('runtime') }}>
-                  Runtime
-                </button>
-                <button className="map-node node-delivery" onClick={() => { setPage('map'); setActiveModule('delivery') }}>
-                  Delivery
-                </button>
-                <button className="map-node node-guardrails" onClick={() => { setPage('map'); setActiveModule('guardrails') }}>
-                  Guardrails
-                </button>
+          <div className="hero-pulse-map" aria-label="Animated system preview">
+            <div className="pulse-core">Infra</div>
+            {t.graph.nodes.map((node, index) => (
+              <div key={node.key} className={`pulse-node pulse-${index + 1}`}>
+                {node.label}
               </div>
-            </section>
+            ))}
+          </div>
+        </section>
 
-            <section className="metrics-grid">
-              {t.home.metrics.map((metric) => (
-                <article key={metric.label} className="metric-card panel">
-                  <p className="metric-value">{metric.value}</p>
-                  <h2>{metric.label}</h2>
-                  <p>{metric.note}</p>
+        <section id="graph" className="panel section-block">
+          <p className="section-overline">{t.graph.overline}</p>
+          <h2>{t.graph.title}</h2>
+          <p className="section-intro">{t.graph.intro}</p>
+
+          <div className="graph-layout">
+            <div className="system-graph" aria-label={t.graph.title}>
+              <div className="graph-center">{t.graph.centerLabel}</div>
+              {t.graph.nodes.map((node, index) => (
+                <button
+                  key={node.key}
+                  className={`graph-node graph-node-${index + 1} ${activeModule === node.key ? 'active' : ''}`}
+                  onClick={() => setActiveModule(node.key)}
+                >
+                  {node.label}
+                </button>
+              ))}
+            </div>
+
+            <article className="graph-detail panel-soft">
+              <p className="section-overline">{t.graph.detailTitle}</p>
+              <h3>{active.title}</h3>
+              <p>{active.blurb}</p>
+              <small>{t.graph.detailHint}</small>
+            </article>
+          </div>
+        </section>
+
+        <section id="flow" className="panel section-block">
+          <p className="section-overline">{t.flow.overline}</p>
+          <h2>{t.flow.title}</h2>
+          <p className="section-intro">{t.flow.intro}</p>
+
+          <div className="flow-diagram">
+            {t.flow.nodes.map((node, index) => (
+              <div key={node.id} className="flow-node-wrap">
+                <article className="flow-node">
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                  <h3>{node.title}</h3>
+                  <p>{node.body}</p>
+                </article>
+                {index < t.flow.nodes.length - 1 && <div className="flow-arrow" aria-hidden="true" />}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section id="mindmap" className="panel section-block">
+          <p className="section-overline">{t.mindmap.overline}</p>
+          <h2>{t.mindmap.title}</h2>
+          <p className="section-intro">{t.mindmap.intro}</p>
+
+          <div className="mindmap-stage">
+            <div className="mindmap-center">{t.mindmap.center}</div>
+            <div className="mindmap-grid">
+              {t.mindmap.branches.map((branch, index) => (
+                <article key={branch.title} className={`mindmap-branch branch-${index + 1}`}>
+                  <h3>{branch.title}</h3>
+                  <ul>
+                    {branch.children.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
                 </article>
               ))}
-            </section>
-
-            <section className="panel section-block">
-              <h2>{t.home.conceptTitle}</h2>
-              <div className="card-grid three-up">
-                {t.home.conceptCards.map((card) => (
-                  <article key={card.title} className="info-card">
-                    <h3>{card.title}</h3>
-                    <p>{card.body}</p>
-                  </article>
-                ))}
-              </div>
-            </section>
-
-            <section className="panel section-block flow-panel">
-              <div className="section-head">
-                <h2>{t.home.flowTitle}</h2>
-                <p className="section-intro">{t.home.flowIntro}</p>
-              </div>
-              <div className="flow-stepper">
-                {t.home.flowSteps.map((step, index) => (
-                  <article key={step.title} className="flow-step-card">
-                    <div className="flow-step-index">{index + 1}</div>
-                    <h3>{step.title}</h3>
-                    <p>{step.body}</p>
-                  </article>
-                ))}
-              </div>
-            </section>
-
-            <section className="panel section-block">
-              <h2>{t.home.outcomeTitle}</h2>
-              <div className="card-grid three-up">
-                {t.home.outcomeCards.map((card) => (
-                  <article key={card.title} className="info-card emphasis-card">
-                    <h3>{card.title}</h3>
-                    <p>{card.body}</p>
-                  </article>
-                ))}
-              </div>
-            </section>
-          </section>
-        )}
-
-        {page === 'map' && (
-          <section className="page page-map">
-            <section className="panel section-block">
-              <p className="section-overline">{t.map.overline}</p>
-              <h2>{t.map.title}</h2>
-              <p className="section-intro">{t.map.intro}</p>
-
-              <div className="interactive-layout">
-                <aside className="module-sidebar">
-                  {t.map.modules.map((item) => (
-                    <button
-                      key={item.key}
-                      className={`module-tab ${item.key === activeModule ? 'active' : ''}`}
-                      onClick={() => setActiveModule(item.key)}
-                    >
-                      <span>{item.shortLabel}</span>
-                      <strong>{item.title.replace(/：.*$/, '').replace(/:.*$/, '')}</strong>
-                    </button>
-                  ))}
-                </aside>
-
-                <div className="module-panel panel-soft">
-                  <div className="module-panel-head">
-                    <div>
-                      <p className="section-overline">{t.map.panelTitle}</p>
-                      <h3>{module.title}</h3>
-                    </div>
-                    <p>{t.map.panelHint}</p>
-                  </div>
-
-                  <p className="module-summary">{module.summary}</p>
-
-                  <div className="module-grid">
-                    <article className="module-card">
-                      <h4>Why it exists</h4>
-                      <p>{module.why}</p>
-                    </article>
-                    <article className="module-card">
-                      <h4>{t.common.examplesLabel}</h4>
-                      <ul>
-                        {module.examples.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                    </article>
-                    <article className="module-card">
-                      <h4>{t.common.risksLabel}</h4>
-                      <ul>
-                        {module.risks.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                    </article>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </section>
-        )}
-
-        {page === 'build' && (
-          <section className="page page-build">
-            <section className="panel section-block">
-              <p className="section-overline">{t.build.overline}</p>
-              <h2>{t.build.title}</h2>
-              <p className="section-intro">{t.build.intro}</p>
-
-              <div className="checklist-grid">
-                {t.build.sections.map((section) => (
-                  <article key={section.title} className="checklist-card">
-                    <h3>{section.title}</h3>
-                    <p>{section.intro}</p>
-                    <ul>
-                      {section.items.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </article>
-                ))}
-              </div>
-            </section>
-
-            <section className="panel section-block">
-              <h2>{t.build.principleTitle}</h2>
-              <div className="card-grid three-up">
-                {t.build.principles.map((item) => (
-                  <article key={item.title} className="info-card warning-card">
-                    <h3>{item.title}</h3>
-                    <p>{item.body}</p>
-                  </article>
-                ))}
-              </div>
-            </section>
-          </section>
-        )}
+            </div>
+          </div>
+        </section>
       </main>
 
       <footer className="footer panel-soft">
